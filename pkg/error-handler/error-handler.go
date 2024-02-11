@@ -8,6 +8,12 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+type Error struct {
+	StatusCode int
+	Err        string
+	ErrMsg     string
+}
+
 // FATAL ERROR LOG [DO NOT USE IN API CODE]
 func CheckErrorAndExit(err error, msg string) {
 	if err != nil {

@@ -5,7 +5,6 @@ import (
 	"log"
 	"time"
 
-	"github.com/cbroglie/mustache"
 	_ "github.com/lib/pq" // for postgres driver init
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
@@ -19,7 +18,6 @@ var client DBClient = nil
 
 type DBClient interface {
 	GetClient() *gorm.DB
-	Execute(string, interface{}, bool) (*gorm.DB, error)
 }
 
 var InitService = func() {
@@ -40,13 +38,14 @@ var InitService = func() {
 			NamingStrategy: schema.NamingStrategy{
 				SingularTable: true,
 			},
+			// Logger: logger.Default.LogMode(logger.Info),
 		})
 		errorHandler.CheckErrorAndExit(err, "Error in integrating GO-ORM with the DB")
 		client = &dBClient{client: gormDB}
 	}
 }
 
-var GetDBClient = func(service string) DBClient {
+var GetDBClient = func() DBClient {
 	return client
 }
 
@@ -56,24 +55,4 @@ type dBClient struct {
 
 func (db *dBClient) GetClient() *gorm.DB {
 	return db.client
-}
-
-// TODO: Review if the below function needed?
-func (db *dBClient) Execute(queryTemplate string, fields interface{}, isSelectQuery bool) (*gorm.DB, error) {
-
-	query, err := mustache.Render(queryTemplate, fields)
-
-	if err != nil {
-		return nil, err
-	}
-
-	var tx *gorm.DB
-	if isSelectQuery {
-		tx = db.client.Raw(query)
-	} else {
-		tx = db.client.Exec(query)
-	}
-
-	err = tx.Error
-	return tx, err
 }

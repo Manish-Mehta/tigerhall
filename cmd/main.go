@@ -7,8 +7,9 @@ import (
 
 	"github.com/gin-contrib/cors"
 
-	"github.com/Manish-Mehta/tigerhall/internal/api"
 	"github.com/Manish-Mehta/tigerhall/internal/config"
+	"github.com/Manish-Mehta/tigerhall/internal/controller"
+	"github.com/Manish-Mehta/tigerhall/model/entities"
 	"github.com/Manish-Mehta/tigerhall/pkg/db"
 	"github.com/Manish-Mehta/tigerhall/pkg/email"
 	"github.com/Manish-Mehta/tigerhall/pkg/resty"
@@ -33,7 +34,14 @@ func main() {
 
 	// Connect DB
 	db.InitService()
-	// TODO: Add migration
+	// TODO: Add/Move migration
+	dBClient := db.GetDBClient().GetClient()
+	err := dBClient.AutoMigrate(&entities.User{})
+	log.Println("Migrating DB")
+	if err != nil {
+		log.Println("DB migration error")
+		log.Fatal(err)
+	}
 
 	allowedOrigins := config.ALLOWED_ORIGINS
 	if allowedOrigins == "" {
@@ -49,7 +57,7 @@ func main() {
 		MaxAge: 12 * time.Hour,
 	})
 
-	api.SetupRouter(server.GinInstance)
+	controller.SetupRouter(server.GinInstance)
 
 	// must be last line
 	server.Listen()
