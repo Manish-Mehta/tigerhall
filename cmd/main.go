@@ -9,6 +9,7 @@ import (
 
 	"github.com/Manish-Mehta/tigerhall/internal/config"
 	"github.com/Manish-Mehta/tigerhall/internal/controller"
+	"github.com/Manish-Mehta/tigerhall/model"
 	"github.com/Manish-Mehta/tigerhall/pkg/db"
 	"github.com/Manish-Mehta/tigerhall/pkg/email"
 	"github.com/Manish-Mehta/tigerhall/pkg/resty"
@@ -31,9 +32,15 @@ func main() {
 	email.InitService(config.EMAIL_SERVICE)
 	email.GetServiceClient(config.EMAIL_SERVICE).CreateClient(email.ClientParam{})
 
-	// Connect DB
+	// Connect DB and run migrations
 	db.InitService()
-	// TODO: Add/Move migration
+
+	dBClient := db.GetDBClient().GetClient()
+	err := model.Migrate(dBClient)
+	if err != nil {
+		log.Println(err)
+		log.Fatal("DB migration failed")
+	}
 
 	allowedOrigins := config.ALLOWED_ORIGINS
 	if allowedOrigins == "" {

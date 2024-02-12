@@ -3,8 +3,10 @@ package controller
 import (
 	"log"
 
+	tc "github.com/Manish-Mehta/tigerhall/internal/controller/tiger"
 	uc "github.com/Manish-Mehta/tigerhall/internal/controller/user"
 	"github.com/Manish-Mehta/tigerhall/internal/middleware"
+	ts "github.com/Manish-Mehta/tigerhall/internal/service/tiger"
 	us "github.com/Manish-Mehta/tigerhall/internal/service/user"
 	"github.com/Manish-Mehta/tigerhall/model/datastore"
 	"github.com/Manish-Mehta/tigerhall/pkg/db"
@@ -36,14 +38,14 @@ func SetupRouter(engine *gin.Engine) {
 		}
 		// Tiger Router
 		{
-			// userRouter := apiRouter.Group("/tiger")
-			// userStore := datastore.NewUserStore(dBClient)
-			// userService := us.NewUserService(userStore)
+			tigerRouter := apiRouter.Group("/tiger")
+			tigerStore := datastore.NewTigerStore(dBClient)
+			tigerService := ts.NewTigerService(tigerStore)
 
-			// userController := uc.NewUserController(userService)
-			// {
-			// 	userRouter.POST("/", userController.Signup)
-			// }
+			tigerController := tc.NewTigerController(tigerService)
+			{
+				tigerRouter.POST("/", tigerController.Create)
+			}
 		}
 	}
 }

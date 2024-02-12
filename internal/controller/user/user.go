@@ -25,7 +25,7 @@ func (uc userController) Signup(c *gin.Context) {
 	defer errorHandler.RecoverAndSendErrRes(c, "Something went wrong while creating user")
 
 	request := &dto.SignupRequest{}
-	if err := c.ShouldBind(&request); err != nil {
+	if err := c.ShouldBind(request); err != nil {
 		interceptor.SendErrRes(c, "Invalid request body", "Check your request body data with proper validations", http.StatusBadRequest)
 		return
 	}
@@ -41,7 +41,7 @@ func (uc userController) Login(c *gin.Context) {
 	defer errorHandler.RecoverAndSendErrRes(c, "Something went wrong while logging in")
 
 	request := &dto.LoginRequest{}
-	if err := c.ShouldBind(&request); err != nil {
+	if err := c.ShouldBind(request); err != nil {
 		interceptor.SendErrRes(c, "Invalid request body", "Check your request body data with proper validations", http.StatusBadRequest)
 		return
 	}
