@@ -18,6 +18,8 @@ var (
 	SERVER_PORT     string
 	ALLOWED_ORIGINS string
 
+	TOKEN_SECRET string
+
 	// Currently set to "brevo" as using brevo
 	EMAIL_SERVICE      string
 	EMAIL_API_ENDPOINT string
@@ -53,6 +55,9 @@ func SetConfig() {
 		DB_STR = Getenv("DB_STR")
 		SERVER_PORT = Getenv("SERVER_PORT")
 		ALLOWED_ORIGINS = Getenv("ALLOWED_ORIGINS")
+	}
+	{
+		TOKEN_SECRET = Getenv("TOKEN_SECRET")
 	}
 	// AWS Config[Not used as Brevo is used for email]
 	{

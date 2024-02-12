@@ -7,7 +7,7 @@ import (
 
 type UserStore interface {
 	Create(*entities.User) error
-	Get(*entities.User, *entities.User, []string) error
+	Get(dest *entities.User, condition *entities.User, fields []string) error
 	EmailExists(string) (bool, error)
 }
 
@@ -29,7 +29,6 @@ func (us *userStore) Create(user *entities.User) error {
 	return us.db.Create(user).Error
 }
 
-// TODO: Check if needed
 func (us *userStore) Get(dest *entities.User, condition *entities.User, fields []string) error {
 	return us.db.Where(condition).Select(fields).Find(dest).Error
 }

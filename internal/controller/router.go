@@ -4,6 +4,7 @@ import (
 	"log"
 
 	uc "github.com/Manish-Mehta/tigerhall/internal/controller/user"
+	"github.com/Manish-Mehta/tigerhall/internal/middleware"
 	us "github.com/Manish-Mehta/tigerhall/internal/service/user"
 	"github.com/Manish-Mehta/tigerhall/model/datastore"
 	"github.com/Manish-Mehta/tigerhall/pkg/db"
@@ -28,6 +29,8 @@ func SetupRouter(engine *gin.Engine) {
 			userController := uc.NewUserController(userService)
 			{
 				userRouter.POST("/", userController.Signup)
+				userRouter.POST("/login", userController.Login)
+				userRouter.POST("/refresh", middleware.AuthMiddleware, userController.Refresh)
 
 			}
 		}
