@@ -13,6 +13,7 @@ type SightStore interface {
 	Create(*entities.Sight) error
 	GetLatest(dest *entities.Sight, condition *entities.Sight, fields []string) error
 	GetDistance(dto.Coordinate, dto.Coordinate) (float64, error)
+	List(dest *[]*entities.Sight, page, limit int, fields []string) error
 }
 
 var NewSightStore = func(db *gorm.DB) SightStore {
@@ -23,21 +24,21 @@ type sightStore struct {
 	db *gorm.DB
 }
 
-func (ts *sightStore) NameExists(name string) (bool, error) {
+func (ss *sightStore) NameExists(name string) (bool, error) {
 	var count int64
-	ts.db.Model(&entities.Sight{}).Where("name = ?", name).Count(&count)
+	ss.db.Model(&entities.Sight{}).Where("name = ?", name).Count(&count)
 	return count > 0, nil
 }
 
-func (ts *sightStore) Create(user *entities.Sight) error {
-	return ts.db.Create(user).Error
+func (ss *sightStore) Create(user *entities.Sight) error {
+	return ss.db.Create(user).Error
 }
 
-func (ts *sightStore) GetLatest(dest *entities.Sight, condition *entities.Sight, fields []string) error {
-	return ts.db.Select(fields).Order("seen_at desc").Find(dest, condition).Limit(1).Error
+func (ss *sightStore) GetLatest(dest *entities.Sight, condition *entities.Sight, fields []string) error {
+	return ss.db.Select(fields).Order("seen_at desc").Find(dest, condition).Limit(1).Error
 }
 
-func (ts *sightStore) GetDistance(coord1, coord2 dto.Coordinate) (float64, error) {
+func (ss *sightStore) GetDistance(coord1, coord2 dto.Coordinate) (float64, error) {
 	var distance float64
 
 	q := fmt.Sprintf(
@@ -45,8 +46,13 @@ func (ts *sightStore) GetDistance(coord1, coord2 dto.Coordinate) (float64, error
 		coord1.Lat, coord1.Lon,
 		coord2.Lat, coord2.Lon,
 	)
-	err := ts.db.Raw(q).Row().Scan(&distance)
+	err := ss.db.Raw(q).Row().Scan(&distance)
 
 	log.Println(distance)
 	return distance, err
+}
+
+func (ss *sightStore) List(dest *[]*entities.Sight, page, limit int, fields []string) error {
+	offset := (page - 1) * limit
+	return ss.db.Select(fields).Order("seen_at desc").Limit(limit).Offset(offset).Find(dest).Error
 }

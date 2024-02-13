@@ -7,7 +7,8 @@ import (
 
 type TigerStore interface {
 	Create(*entities.Tiger) error
-	Get(dest *entities.Tiger, condition *entities.Tiger, fields []string) error
+	Update(*entities.Tiger) error
+	List(dest *[]*entities.Tiger, page int, limit int) error
 	NameExists(string) (bool, error)
 }
 
@@ -25,10 +26,19 @@ func (ts *tigerStore) NameExists(name string) (bool, error) {
 	return count > 0, nil
 }
 
-func (ts *tigerStore) Create(user *entities.Tiger) error {
-	return ts.db.Create(user).Error
+func (ts *tigerStore) Create(tiger *entities.Tiger) error {
+	return ts.db.Create(tiger).Error
+}
+
+func (ts *tigerStore) Update(tiger *entities.Tiger) error {
+	return ts.db.Model(tiger).Updates(tiger).Error
 }
 
 func (ts *tigerStore) Get(dest *entities.Tiger, condition *entities.Tiger, fields []string) error {
 	return ts.db.Where(condition).Select(fields).Find(dest).Error
+}
+
+func (ts *tigerStore) List(dest *[]*entities.Tiger, page int, limit int) error {
+	offset := (page - 1) * limit
+	return ts.db.Order("last_seen desc").Limit(limit).Offset(offset).Find(dest).Error
 }

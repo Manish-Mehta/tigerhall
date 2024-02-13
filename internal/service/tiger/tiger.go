@@ -1,6 +1,7 @@
 package tiger
 
 import (
+	"log"
 	"net/http"
 
 	"gorm.io/datatypes"
@@ -14,7 +15,7 @@ import (
 
 type TigerService interface {
 	Create(request *dto.TigerCreateRequest) *errorHandler.Error
-	// List(request *dto.TigerCreateSightingRequest) *errorHandler.Error
+	List(int, int) (*[]*entities.Tiger, *errorHandler.Error)
 }
 
 type tigerService struct {
@@ -74,6 +75,21 @@ func (service *tigerService) Create(request *dto.TigerCreateRequest) *errorHandl
 		}
 	}
 	return nil
+}
+
+func (service *tigerService) List(page int, limit int) (*[]*entities.Tiger, *errorHandler.Error) {
+
+	var tigers []*entities.Tiger
+	err := service.dataStore.List(&tigers, page, limit)
+	if err != nil {
+		log.Println(err)
+		return nil, &errorHandler.Error{
+			Err:        "Tiger fetch failed",
+			ErrMsg:     "Error while getting tiger",
+			StatusCode: http.StatusInternalServerError,
+		}
+	}
+	return &tigers, nil
 }
 
 func NewTigerService(ds datastore.TigerStore) TigerService {

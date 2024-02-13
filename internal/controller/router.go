@@ -40,25 +40,27 @@ func SetupRouter(engine *gin.Engine) {
 			}
 		}
 		// Tiger Router
+		tigerStore := datastore.NewTigerStore(dBClient)
 		{
 			tigerRouter := apiRouter.Group("/tiger")
-			tigerStore := datastore.NewTigerStore(dBClient)
 			tigerService := ts.NewTigerService(tigerStore)
 
 			tigerController := tc.NewTigerController(tigerService)
 			{
 				tigerRouter.POST("", middleware.AuthMiddleware, tigerController.Create)
+				tigerRouter.GET("", tigerController.List)
 			}
 		}
 		// Sight Router
 		{
 			sightRouter := apiRouter.Group("/sight")
 			sightStore := datastore.NewSightStore(dBClient)
-			sightService := ss.NewSightService(sightStore)
+			sightService := ss.NewSightService(sightStore, tigerStore)
 
 			sightController := sc.NewSightController(sightService)
 			{
 				sightRouter.POST("", middleware.AuthMiddleware, sightController.Create)
+				sightRouter.GET("", sightController.List)
 			}
 		}
 	}

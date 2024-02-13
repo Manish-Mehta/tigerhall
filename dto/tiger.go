@@ -24,3 +24,13 @@ type CreateSightingRequest struct {
 	SeenAt  time.Time             `form:"seenAt" binding:"required"`
 	Image   *multipart.FileHeader `form:"image" binding:"required"`
 }
+
+type ListSightingResponse struct {
+	ID       uint      `json:"id" binding:"required"`
+	TigerID  uint      `json:"tigerId" binding:"required"`
+	UserID   uint      `json:"userId"`
+	Lat      float64   `json:"lat" binding:"required"`
+	Lon      float64   `json:"lon" binding:"required"`
+	SeenAt   time.Time `json:"seenAt" binding:"required"`
+	ImageURL string    `json:"image" binding:"required"`
+}

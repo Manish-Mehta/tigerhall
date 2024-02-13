@@ -3,6 +3,7 @@ package tiger
 import (
 	"log"
 	"net/http"
+	"strconv"
 
 	errorHandler "github.com/Manish-Mehta/tigerhall/pkg/error-handler"
 	"github.com/Manish-Mehta/tigerhall/pkg/interceptor"
@@ -14,10 +15,13 @@ import (
 
 type SightController interface {
 	Create(c *gin.Context)
+	List(c *gin.Context)
 }
 type sightController struct {
 	service ss.SightService
 }
+
+const LIMIT = 5
 
 func (sc sightController) Create(c *gin.Context) {
 	defer errorHandler.RecoverAndSendErrRes(c, "Something went wrong while creating sight")
@@ -43,6 +47,37 @@ func (sc sightController) Create(c *gin.Context) {
 		return
 	}
 	interceptor.SendSuccessRes(c, map[string]string{"message": "Tiger sighting created"}, http.StatusCreated)
+}
+
+func (sc sightController) List(c *gin.Context) {
+	defer errorHandler.RecoverAndSendErrRes(c, "Something went wrong while creating tiger")
+
+	var page int64 = 1
+	var limit int64 = LIMIT
+	o := c.DefaultQuery("page", "1")
+	if v, err := strconv.ParseInt(o, 10, 32); err == nil {
+		if v < 0 {
+			page = 0
+		} else {
+			page = v
+		}
+	}
+
+	l := c.DefaultQuery("limit", strconv.Itoa(LIMIT))
+	if v, err := strconv.ParseInt(l, 10, 32); err == nil {
+		if v <= 0 || v > LIMIT {
+			limit = LIMIT
+		} else {
+			limit = v
+		}
+	}
+
+	sightings, err := sc.service.List(int(page), int(limit))
+	if err != nil {
+		interceptor.SendErrRes(c, err.Err, err.ErrMsg, err.StatusCode)
+		return
+	}
+	interceptor.SendSuccessRes(c, sightings, http.StatusCreated)
 }
 
 func NewSightController(sightService ss.SightService) SightController {

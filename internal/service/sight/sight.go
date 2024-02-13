@@ -15,10 +15,11 @@ import (
 type SightService interface {
 	create(*dto.CreateSightingRequest, string) *errorHandler.Error
 	Create(*dto.CreateSightingRequest) *errorHandler.Error
+	List(page int, limit int) (*[]*dto.ListSightingResponse, *errorHandler.Error)
 }
-
 type sightService struct {
-	dataStore datastore.SightStore
+	dataStore  datastore.SightStore
+	tigerStore datastore.TigerStore
 }
 
 func (service *sightService) Create(request *dto.CreateSightingRequest) *errorHandler.Error {
@@ -82,8 +83,8 @@ func (service *sightService) Create(request *dto.CreateSightingRequest) *errorHa
 	}
 	if distance <= 5 {
 		return &errorHandler.Error{
-			Err:        "Sight exists within 5km",
-			ErrMsg:     "Sighting should be 5 km or more far than previous one",
+			Err:        "Previous sight exists within 5km",
+			ErrMsg:     "Sighting should be further than 5 km from the previous one",
 			StatusCode: http.StatusConflict,
 		}
 	}
@@ -114,12 +115,52 @@ func (service *sightService) create(request *dto.CreateSightingRequest, imgType 
 			StatusCode: http.StatusInternalServerError,
 		}
 	}
+
+	service.tigerStore.Update(
+		&entities.Tiger{
+			ID:       sightEntity.TigerID,
+			LastSeen: sightEntity.SeenAt,
+			Lat:      sightEntity.Lat,
+			Lon:      sightEntity.Lon,
+		},
+	)
+
 	// TODO: Start process of email sending Asynch  with Queue
 	return nil
 }
 
-func NewSightService(ds datastore.SightStore) SightService {
+func (service *sightService) List(page int, limit int) (*[]*dto.ListSightingResponse, *errorHandler.Error) {
+
+	var sightings []*entities.Sight
+	var sightingRes []*dto.ListSightingResponse
+
+	err := service.dataStore.List(&sightings, page, limit, []string{"id", "lat", "lon", "seen_at", "image_url", "tiger_id", "user_id"})
+	if err != nil {
+		log.Println(err)
+		return nil, &errorHandler.Error{
+			Err:        "Sighting fetch failed",
+			ErrMsg:     "Error while getting Sights",
+			StatusCode: http.StatusInternalServerError,
+		}
+	}
+	for _, sighting := range sightings {
+		sightingResponse := &dto.ListSightingResponse{
+			ID:       sighting.ID,
+			Lat:      sighting.Lat,
+			Lon:      sighting.Lon,
+			SeenAt:   sighting.SeenAt,
+			ImageURL: sighting.ImageURL,
+			TigerID:  sighting.TigerID,
+			UserID:   sighting.UserID,
+		}
+		sightingRes = append(sightingRes, sightingResponse)
+	}
+	return &sightingRes, nil
+}
+
+func NewSightService(ds datastore.SightStore, ts datastore.TigerStore) SightService {
 	return &sightService{
-		dataStore: ds,
+		dataStore:  ds,
+		tigerStore: ts,
 	}
 }
