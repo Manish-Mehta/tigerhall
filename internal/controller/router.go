@@ -16,6 +16,7 @@ import (
 func SetupRouter(engine *gin.Engine) {
 	log.Println("Initializing Routes")
 	dBClient := db.GetDBClient().GetClient()
+	engine.MaxMultipartMemory = 8 << 20 // 8 MiB
 
 	apiRouter := engine.Group("/api/v1")
 	{
@@ -44,7 +45,8 @@ func SetupRouter(engine *gin.Engine) {
 
 			tigerController := tc.NewTigerController(tigerService)
 			{
-				tigerRouter.POST("/", tigerController.Create)
+				tigerRouter.POST("/", middleware.AuthMiddleware, tigerController.Create)
+				tigerRouter.POST("/sight", middleware.AuthMiddleware, tigerController.CreateSighting)
 			}
 		}
 	}

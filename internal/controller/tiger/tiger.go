@@ -14,7 +14,7 @@ import (
 
 type TigerController interface {
 	Create(c *gin.Context)
-	// Login(c *gin.Context)
+	CreateSighting(c *gin.Context)
 	// Refresh(c *gin.Context)
 }
 type tigerController struct {
@@ -26,12 +26,37 @@ func (tc tigerController) Create(c *gin.Context) {
 
 	request := &dto.TigerCreateRequest{}
 	if err := c.ShouldBind(request); err != nil {
-		log.Println(err)
 		interceptor.SendErrRes(c, "Invalid request body", "Check your request body data with proper validations", http.StatusBadRequest)
 		return
 	}
 
 	err := tc.service.Create(request)
+	if err != nil {
+		interceptor.SendErrRes(c, err.Err, err.ErrMsg, err.StatusCode)
+		return
+	}
+	interceptor.SendSuccessRes(c, map[string]string{"message": "Tiger created"}, http.StatusCreated)
+}
+
+func (tc tigerController) CreateSighting(c *gin.Context) {
+	defer errorHandler.RecoverAndSendErrRes(c, "Something went wrong while creating sighting")
+
+	userId, exists := c.Get("Id")
+	if !exists {
+		interceptor.SendErrRes(c, "Access token malformed", "Invalid access token", http.StatusBadRequest)
+		return
+	}
+
+	request := &dto.TigerCreateSightingRequest{}
+	request.UserID = uint(userId.(uint64))
+
+	if err := c.ShouldBind(request); err != nil {
+		log.Println(err)
+		interceptor.SendErrRes(c, "Invalid request body", "Check your request body data with proper validations", http.StatusBadRequest)
+		return
+	}
+
+	err := tc.service.CreateSighting(request)
 	if err != nil {
 		interceptor.SendErrRes(c, err.Err, err.ErrMsg, err.StatusCode)
 		return

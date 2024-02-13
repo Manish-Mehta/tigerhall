@@ -1,6 +1,9 @@
 package dto
 
-import "time"
+import (
+	"mime/multipart"
+	"time"
+)
 
 type Coordinate struct {
 	Lat float64 `json:"lat" binding:"required"`
@@ -13,8 +16,11 @@ type TigerCreateRequest struct {
 	LastSeen   time.Time  `json:"lastSeen" binding:"required"`
 	Coordinate Coordinate `json:"coordinate" binding:"required"`
 }
-
-type TigerListResponse struct {
-	Email    string `json:"email" binding:"required,email"`
-	Password string `json:"password" binding:"required,min=5"`
+type TigerCreateSightingRequest struct {
+	TigerID uint                  `form:"tigerId" binding:"required"`
+	UserID  uint                  `form:"userId"`
+	Lat     float64               `form:"lat" binding:"required"`
+	Lon     float64               `form:"lon" binding:"required"`
+	SeenAt  time.Time             `form:"seenAt" binding:"required"`
+	Image   *multipart.FileHeader `form:"image" binding:"required"`
 }

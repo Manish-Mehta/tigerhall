@@ -3,6 +3,7 @@ package user
 import (
 	"log"
 	"net/http"
+	"strconv"
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
@@ -65,7 +66,7 @@ func (service *userService) Login(request *dto.LoginRequest) (string, *errorHand
 	// Only doing basic validations
 
 	userEntity := &entities.User{}
-	err := service.dataStore.Get(userEntity, &entities.User{Email: request.Email}, []string{"email", "password"})
+	err := service.dataStore.Get(userEntity, &entities.User{Email: request.Email}, []string{"id", "email", "password"})
 	if err != nil {
 		return "", &errorHandler.Error{
 			Err:        "User fetch failed",
@@ -93,6 +94,7 @@ func (service *userService) Login(request *dto.LoginRequest) (string, *errorHand
 	claims := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.RegisteredClaims{
 		Subject:   userEntity.Email,
 		ExpiresAt: jwt.NewNumericDate(time.Now().Add(time.Hour * 24 * 1)),
+		Issuer:    strconv.FormatUint(uint64(userEntity.ID), 10),
 	})
 	token, err := claims.SignedString([]byte(config.TOKEN_SECRET))
 	if err != nil {
@@ -119,7 +121,7 @@ func (service *userService) Refresh(email string, expiry time.Time) (string, *er
 
 	// Move the below code in a common lib function as to be used by login also.
 	userEntity := &entities.User{}
-	err := service.dataStore.Get(userEntity, &entities.User{Email: email}, []string{"email"})
+	err := service.dataStore.Get(userEntity, &entities.User{Email: email}, []string{"id", "email"})
 	if err != nil {
 		return "", &errorHandler.Error{
 			Err:        "User fetch failed",
@@ -138,6 +140,7 @@ func (service *userService) Refresh(email string, expiry time.Time) (string, *er
 	claims := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.RegisteredClaims{
 		Subject:   userEntity.Email,
 		ExpiresAt: jwt.NewNumericDate(time.Now().Add(time.Hour * 24 * 1)),
+		Issuer:    strconv.FormatUint(uint64(userEntity.ID), 10),
 	})
 	token, err := claims.SignedString([]byte(config.TOKEN_SECRET))
 	if err != nil {

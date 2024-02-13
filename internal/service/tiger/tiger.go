@@ -1,19 +1,22 @@
 package tiger
 
 import (
+	"log"
 	"net/http"
-	"time"
+
+	"gorm.io/datatypes"
 
 	"github.com/Manish-Mehta/tigerhall/dto"
+	"github.com/Manish-Mehta/tigerhall/internal/util"
 	"github.com/Manish-Mehta/tigerhall/model/datastore"
 	"github.com/Manish-Mehta/tigerhall/model/entities"
 	errorHandler "github.com/Manish-Mehta/tigerhall/pkg/error-handler"
-	"gorm.io/datatypes"
+	imageHandler "github.com/Manish-Mehta/tigerhall/pkg/image-handler"
 )
 
 type TigerService interface {
 	Create(request *dto.TigerCreateRequest) *errorHandler.Error
-	// Login(request *dto.LoginRequest) (string, *errorHandler.Error)
+	CreateSighting(request *dto.TigerCreateSightingRequest) *errorHandler.Error
 	// Refresh(string, time.Time) (string, *errorHandler.Error)
 }
 
@@ -22,13 +25,23 @@ type tigerService struct {
 }
 
 func (service *tigerService) Create(request *dto.TigerCreateRequest) *errorHandler.Error {
-	format := "2006-01-02"
-	dob, err := time.Parse(format, request.DOB)
+	validator := util.NewValidator()
+
+	dob, err := validator.ValDateFormat(request.DOB)
 	if err != nil {
 		return &errorHandler.Error{
 			Err:        "Invalid DOB",
 			ErrMsg:     "Provide valid DOB date in yyyy-mm-dd format",
 			StatusCode: http.StatusBadRequest,
+		}
+	}
+
+	err = validator.ValCoord(request.Coordinate)
+	if err != nil {
+		return &errorHandler.Error{
+			Err:        "Invalid coordinates",
+			ErrMsg:     "Provide valid coordinates",
+			StatusCode: http.StatusInternalServerError,
 		}
 	}
 
@@ -49,11 +62,11 @@ func (service *tigerService) Create(request *dto.TigerCreateRequest) *errorHandl
 	}
 
 	tigerEntity := &entities.Tiger{
-		Name: request.Name,
-		Dob:  datatypes.Date(dob),
-		// LastSeen: request.LastSeen,
-		// Lat:      request.Coordinate.Lat,
-		// Lon:      request.Coordinate.Lon,
+		Name:     request.Name,
+		Dob:      datatypes.Date(dob),
+		LastSeen: request.LastSeen,
+		Lat:      request.Coordinate.Lat,
+		Lon:      request.Coordinate.Lon,
 	}
 	err = service.dataStore.Create(tigerEntity)
 	if err != nil {
@@ -63,6 +76,60 @@ func (service *tigerService) Create(request *dto.TigerCreateRequest) *errorHandl
 			StatusCode: http.StatusInternalServerError,
 		}
 	}
+	return nil
+}
+
+func (service *tigerService) CreateSighting(request *dto.TigerCreateSightingRequest) *errorHandler.Error {
+	validator := util.NewValidator()
+
+	log.Println(request.Image.Filename, request.Image.Size, request.Image.Header.Get("Content-Type"))
+
+	// TODO: Add validation of all Data and the 5KM check
+
+	imgType, err := validator.ValImage(request.Image)
+	if err != nil {
+		return &errorHandler.Error{
+			Err:        "Invalid Image",
+			ErrMsg:     err.Error(),
+			StatusCode: http.StatusBadRequest,
+		}
+	}
+
+	imgErr := imageHandler.ProcessImage(request.Image, request.TigerID, imgType)
+	if imgErr != nil {
+		return imgErr
+	}
+	// exists, err := service.dataStore.NameExists(request.Name)
+	// if err != nil {
+	// 	return &errorHandler.Error{
+	// 		Err:        "Tiger check failed",
+	// 		ErrMsg:     "Error while creating tiger in the system",
+	// 		StatusCode: http.StatusInternalServerError,
+	// 	}
+	// }
+	// if exists {
+	// 	return &errorHandler.Error{
+	// 		Err:        "Tiger name exists",
+	// 		ErrMsg:     "Tiger already exists",
+	// 		StatusCode: http.StatusConflict,
+	// 	}
+	// }
+
+	// tigerEntity := &entities.Tiger{
+	// 	Name:     request.Name,
+	// 	Dob:      datatypes.Date(dob),
+	// 	LastSeen: request.LastSeen,
+	// 	Lat:      request.Coordinate.Lat,
+	// 	Lon:      request.Coordinate.Lon,
+	// }
+	// err = service.dataStore.Create(tigerEntity)
+	// if err != nil {
+	// 	return &errorHandler.Error{
+	// 		Err:        "Tiger creation failed",
+	// 		ErrMsg:     "Error while creating user in the system",
+	// 		StatusCode: http.StatusInternalServerError,
+	// 	}
+	// }
 	return nil
 }
 

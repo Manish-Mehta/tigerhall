@@ -11,6 +11,7 @@ require (
 	github.com/golang-jwt/jwt/v5 v5.2.0
 	github.com/joho/godotenv v1.3.0
 	github.com/lib/pq v1.10.2
+	github.com/nfnt/resize v0.0.0-20180221191011-83c6a9932646
 	golang.org/x/crypto v0.14.0
 	gorm.io/datatypes v1.0.6
 	gorm.io/driver/postgres v1.3.5

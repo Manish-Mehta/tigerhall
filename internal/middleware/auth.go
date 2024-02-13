@@ -3,6 +3,7 @@ package middleware
 import (
 	"log"
 	"net/http"
+	"strconv"
 	"strings"
 	"time"
 
@@ -37,6 +38,9 @@ func AuthMiddleware(c *gin.Context) {
 	if strings.HasSuffix(c.Request.URL.Path, "refresh") {
 		c.Set("TokenExpiry", claims.ExpiresAt)
 	}
+	u, err := strconv.ParseUint(claims.Issuer, 10, 64)
+
+	c.Set("Id", u)
 	c.Set("Email", claims.Subject)
 
 	c.Next()
