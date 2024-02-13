@@ -1,7 +1,6 @@
 package middleware
 
 import (
-	"log"
 	"net/http"
 	"strconv"
 	"strings"
@@ -28,11 +27,13 @@ func AuthMiddleware(c *gin.Context) {
 
 	if err != nil {
 		interceptor.SendErrRes(c, "Access denied", "Invalid access token", http.StatusUnauthorized)
+		return
 	} else if claims, ok = token.Claims.(*jwt.RegisteredClaims); ok {
-		log.Println("claims.Subject, claims.ExpiresAt")
-		log.Println(claims.Subject, claims.ExpiresAt)
+		// log.Println("claims.Subject, claims.ExpiresAt")
+		// log.Println(claims.Subject, claims.ExpiresAt)
 	} else {
 		interceptor.SendErrRes(c, "Token verification failed", "Error while checking token", http.StatusUnauthorized)
+		return
 	}
 
 	if strings.HasSuffix(c.Request.URL.Path, "refresh") {

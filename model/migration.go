@@ -30,7 +30,7 @@ func Migrate(db *gorm.DB) error {
 	}
 
 	// Sighting table
-	if err := tx.AutoMigrate(&entities.Sighting{}); err != nil {
+	if err := tx.AutoMigrate(&entities.Sight{}); err != nil {
 		tx.Rollback()
 		return err
 	}

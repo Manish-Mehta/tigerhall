@@ -2,7 +2,6 @@ package util
 
 import (
 	"errors"
-	"fmt"
 	"mime/multipart"
 	"time"
 
@@ -10,6 +9,7 @@ import (
 	"github.com/Manish-Mehta/tigerhall/internal/config"
 )
 
+// Basic Validator for this project
 type Validator interface {
 	ValDateFormat(string) (time.Time, error)
 	valLat(float64) error
@@ -28,14 +28,14 @@ type validator struct {
 
 func (v *validator) valLat(lat float64) error {
 	if lat < -90 || lat > 90 {
-		return fmt.Errorf("latitude must be between -90 and 90")
+		return errors.New("latitude must be between -90 and 90")
 	}
 	return nil
 }
 
 func (v *validator) valLon(lon float64) error {
 	if lon < -180 || lon > 180 {
-		return fmt.Errorf("longitude must be between -180 and 180")
+		return errors.New("longitude must be between -180 and 180")
 	}
 	return nil
 }

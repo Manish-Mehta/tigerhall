@@ -3,9 +3,11 @@ package controller
 import (
 	"log"
 
+	sc "github.com/Manish-Mehta/tigerhall/internal/controller/sight"
 	tc "github.com/Manish-Mehta/tigerhall/internal/controller/tiger"
 	uc "github.com/Manish-Mehta/tigerhall/internal/controller/user"
 	"github.com/Manish-Mehta/tigerhall/internal/middleware"
+	ss "github.com/Manish-Mehta/tigerhall/internal/service/sight"
 	ts "github.com/Manish-Mehta/tigerhall/internal/service/tiger"
 	us "github.com/Manish-Mehta/tigerhall/internal/service/user"
 	"github.com/Manish-Mehta/tigerhall/model/datastore"
@@ -31,7 +33,7 @@ func SetupRouter(engine *gin.Engine) {
 			userService := us.NewUserService(userStore)
 			userController := uc.NewUserController(userService)
 			{
-				userRouter.POST("/", userController.Signup)
+				userRouter.POST("", userController.Signup)
 				userRouter.POST("/login", userController.Login)
 				userRouter.POST("/refresh", middleware.AuthMiddleware, userController.Refresh)
 
@@ -45,8 +47,18 @@ func SetupRouter(engine *gin.Engine) {
 
 			tigerController := tc.NewTigerController(tigerService)
 			{
-				tigerRouter.POST("/", middleware.AuthMiddleware, tigerController.Create)
-				tigerRouter.POST("/sight", middleware.AuthMiddleware, tigerController.CreateSighting)
+				tigerRouter.POST("", middleware.AuthMiddleware, tigerController.Create)
+			}
+		}
+		// Sight Router
+		{
+			sightRouter := apiRouter.Group("/sight")
+			sightStore := datastore.NewSightStore(dBClient)
+			sightService := ss.NewSightService(sightStore)
+
+			sightController := sc.NewSightController(sightService)
+			{
+				sightRouter.POST("", middleware.AuthMiddleware, sightController.Create)
 			}
 		}
 	}

@@ -19,16 +19,16 @@ type tigerStore struct {
 	db *gorm.DB
 }
 
-func (us *tigerStore) NameExists(name string) (bool, error) {
+func (ts *tigerStore) NameExists(name string) (bool, error) {
 	var count int64
-	us.db.Model(&entities.Tiger{}).Where("name = ?", name).Count(&count)
+	ts.db.Model(&entities.Tiger{}).Where("name = ?", name).Count(&count)
 	return count > 0, nil
 }
 
-func (us *tigerStore) Create(user *entities.Tiger) error {
-	return us.db.Create(user).Error
+func (ts *tigerStore) Create(user *entities.Tiger) error {
+	return ts.db.Create(user).Error
 }
 
-func (us *tigerStore) Get(dest *entities.Tiger, condition *entities.Tiger, fields []string) error {
-	return us.db.Where(condition).Select(fields).Find(dest).Error
+func (ts *tigerStore) Get(dest *entities.Tiger, condition *entities.Tiger, fields []string) error {
+	return ts.db.Where(condition).Select(fields).Find(dest).Error
 }
