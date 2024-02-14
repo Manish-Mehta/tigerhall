@@ -23,6 +23,22 @@ type sightController struct {
 
 const LIMIT = 5
 
+// CreateSighting godoc
+//
+//	@Summary		Create a new sighting of a tiger
+//	@Description	Records last sighting of a tiger
+//	@Description	NOTE: Access Token needed in Authorization header
+//	@Tags			sighting
+//	@Accept			json
+//	@Produce		json
+//	@Param			sight			body		dto.CreateSightingRequest true	"Sight Details"
+//	@Success		201
+//	@Failure		409	{object}	errorhandler.Error
+//	@Failure		400	{object}	errorhandler.Error
+//	@Failure		500	{object}	errorhandler.Error
+//	@Router			/sight [post]
+//
+// @Security ApiKeyAuth
 func (sc sightController) Create(c *gin.Context) {
 	defer errorHandler.RecoverAndSendErrRes(c, "Something went wrong while creating sight")
 
@@ -49,6 +65,19 @@ func (sc sightController) Create(c *gin.Context) {
 	interceptor.SendSuccessRes(c, map[string]string{"message": "Tiger sighting created"}, http.StatusCreated)
 }
 
+// ListTigers godoc
+//
+//	@Summary		List All Sighting of Tigers
+//	@Description	Sorted by the last time the tigers were seen.
+//	@Tags			sighting
+//	@Accept			json
+//	@Produce		json
+//	@Param   		page         	query    	int        false  "Page number to be fetched"         		 minimum(1)
+//	@Param   		limit         	query    	int        false  "Number of records to be fetched"          minimum(1)
+//	@Success		200 {array}		dto.ListSightingResponse
+//	@Failure		400	{object}	errorhandler.Error
+//	@Failure		500	{object}	errorhandler.Error
+//	@Router			/sight [get]
 func (sc sightController) List(c *gin.Context) {
 	defer errorHandler.RecoverAndSendErrRes(c, "Something went wrong while creating tiger")
 

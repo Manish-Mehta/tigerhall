@@ -24,7 +24,7 @@ type userController struct {
 // UserSignup godoc
 //
 //	@Summary		User Signup
-//	@Description	creates a new user
+//	@Description	Creates a new user
 //	@Tags			user
 //	@Accept			json
 //	@Produce		json
@@ -53,7 +53,7 @@ func (uc userController) Signup(c *gin.Context) {
 // UserLogin godoc
 //
 //	@Summary		User Login
-//	@Description	log the user in
+//	@Description	Log the user in
 //	@Tags			user
 //	@Accept			json
 //	@Produce		json
@@ -81,7 +81,8 @@ func (uc userController) Login(c *gin.Context) {
 // UserTokenRefresh godoc
 //
 //	@Summary		User Token Refresh
-//	@Description	Refreshes the user access token
+//	@Description	Refreshes the user access token.
+//	@Description	NOTE: Access Token needed in Authorization header
 //	@Tags			user
 //	@Accept			json
 //	@Produce		json

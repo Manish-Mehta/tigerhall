@@ -16,6 +16,15 @@ type TigerCreateRequest struct {
 	LastSeen   time.Time  `json:"lastSeen" binding:"required"`
 	Coordinate Coordinate `json:"coordinate" binding:"required"`
 }
+
+type ListTigerResponse struct {
+	ID         uint       `json:"id" binding:"required"`
+	Name       string     `json:"name" binding:"required"`
+	DOB        time.Time  `json:"dob" binding:"required"`
+	LastSeen   time.Time  `json:"lastSeen" binding:"required"`
+	Coordinate Coordinate `json:"coordinate" binding:"required"`
+}
+
 type CreateSightingRequest struct {
 	TigerID uint                  `form:"tigerId" binding:"required"`
 	UserID  uint                  `form:"userId"`

@@ -22,6 +22,22 @@ type tigerController struct {
 
 const LIMIT = 5
 
+// CreateTiger godoc
+//
+//	@Summary		Create Tiger
+//	@Description	Creates a new tiger
+//	@Description	NOTE: Access Token needed in Authorization header
+//	@Tags			tiger
+//	@Accept			json
+//	@Produce		json
+//	@Param			tiger			body		dto.TigerCreateRequest true	"Tiger Details"
+//	@Success		201
+//	@Failure		409	{object}	errorhandler.Error
+//	@Failure		400	{object}	errorhandler.Error
+//	@Failure		500	{object}	errorhandler.Error
+//	@Router			/tiger [post]
+//
+// @Security ApiKeyAuth
 func (tc tigerController) Create(c *gin.Context) {
 	defer errorHandler.RecoverAndSendErrRes(c, "Something went wrong while creating tiger")
 
@@ -39,6 +55,19 @@ func (tc tigerController) Create(c *gin.Context) {
 	interceptor.SendSuccessRes(c, map[string]string{"message": "Tiger created"}, http.StatusCreated)
 }
 
+// ListTigers godoc
+//
+//	@Summary		List All Tigers
+//	@Description	Sorted by the last time the tigers were seen.
+//	@Tags			tiger
+//	@Accept			json
+//	@Produce		json
+//	@Param   		page         	query    	int        false  "Page number to be fetched"         		 minimum(1)
+//	@Param   		limit         	query    	int        false  "Number of records to be fetched"          minimum(1)
+//	@Success		200 {array}		dto.ListTigerResponse
+//	@Failure		400	{object}	errorhandler.Error
+//	@Failure		500	{object}	errorhandler.Error
+//	@Router			/tiger [get]
 func (tc tigerController) List(c *gin.Context) {
 	defer errorHandler.RecoverAndSendErrRes(c, "Something went wrong while creating tiger")
 
@@ -67,7 +96,7 @@ func (tc tigerController) List(c *gin.Context) {
 		interceptor.SendErrRes(c, err.Err, err.ErrMsg, err.StatusCode)
 		return
 	}
-	interceptor.SendSuccessRes(c, tigers, http.StatusCreated)
+	interceptor.SendSuccessRes(c, tigers, http.StatusOK)
 }
 
 func NewTigerController(tigerService ts.TigerService) TigerController {

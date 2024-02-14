@@ -3,6 +3,7 @@ package tiger
 import (
 	"log"
 	"net/http"
+	"time"
 
 	"gorm.io/datatypes"
 
@@ -15,7 +16,7 @@ import (
 
 type TigerService interface {
 	Create(request *dto.TigerCreateRequest) *errorHandler.Error
-	List(int, int) (*[]*entities.Tiger, *errorHandler.Error)
+	List(int, int) (*[]*dto.ListTigerResponse, *errorHandler.Error)
 }
 
 type tigerService struct {
@@ -77,9 +78,11 @@ func (service *tigerService) Create(request *dto.TigerCreateRequest) *errorHandl
 	return nil
 }
 
-func (service *tigerService) List(page int, limit int) (*[]*entities.Tiger, *errorHandler.Error) {
+func (service *tigerService) List(page int, limit int) (*[]*dto.ListTigerResponse, *errorHandler.Error) {
 
 	var tigers []*entities.Tiger
+	var tigersRes []*dto.ListTigerResponse
+
 	err := service.dataStore.List(&tigers, page, limit)
 	if err != nil {
 		log.Println(err)
@@ -89,7 +92,21 @@ func (service *tigerService) List(page int, limit int) (*[]*entities.Tiger, *err
 			StatusCode: http.StatusInternalServerError,
 		}
 	}
-	return &tigers, nil
+	for _, tiger := range tigers {
+		coord := dto.Coordinate{
+			Lat: tiger.Lat,
+			Lon: tiger.Lon,
+		}
+		tigersResponse := &dto.ListTigerResponse{
+			ID:         tiger.ID,
+			Name:       tiger.Name,
+			DOB:        time.Time(tiger.Dob),
+			LastSeen:   tiger.LastSeen,
+			Coordinate: coord,
+		}
+		tigersRes = append(tigersRes, tigersResponse)
+	}
+	return &tigersRes, nil
 }
 
 func NewTigerService(ds datastore.TigerStore) TigerService {
