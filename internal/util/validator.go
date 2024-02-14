@@ -5,7 +5,7 @@ import (
 	"mime/multipart"
 	"time"
 
-	"github.com/Manish-Mehta/tigerhall/dto"
+	"github.com/Manish-Mehta/tigerhall/api/dto"
 	"github.com/Manish-Mehta/tigerhall/internal/config"
 )
 

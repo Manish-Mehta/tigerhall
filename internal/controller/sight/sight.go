@@ -9,7 +9,7 @@ import (
 	"github.com/Manish-Mehta/tigerhall/pkg/interceptor"
 	"github.com/gin-gonic/gin"
 
-	"github.com/Manish-Mehta/tigerhall/dto"
+	"github.com/Manish-Mehta/tigerhall/api/dto"
 	ss "github.com/Manish-Mehta/tigerhall/internal/service/sight"
 )
 

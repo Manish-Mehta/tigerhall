@@ -6,7 +6,7 @@ import (
 
 	"gorm.io/datatypes"
 
-	"github.com/Manish-Mehta/tigerhall/dto"
+	"github.com/Manish-Mehta/tigerhall/api/dto"
 	"github.com/Manish-Mehta/tigerhall/internal/util"
 	"github.com/Manish-Mehta/tigerhall/model/datastore"
 	"github.com/Manish-Mehta/tigerhall/model/entities"

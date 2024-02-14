@@ -7,8 +7,8 @@ import (
 
 	"github.com/gin-contrib/cors"
 
+	"github.com/Manish-Mehta/tigerhall/api"
 	"github.com/Manish-Mehta/tigerhall/internal/config"
-	"github.com/Manish-Mehta/tigerhall/internal/controller"
 	"github.com/Manish-Mehta/tigerhall/model"
 	"github.com/Manish-Mehta/tigerhall/pkg/db"
 	"github.com/Manish-Mehta/tigerhall/pkg/email"
@@ -55,7 +55,7 @@ func main() {
 		MaxAge:           12 * time.Hour,
 	})
 
-	controller.SetupRouter(server.GinInstance)
+	api.SetupRouter(server.GinInstance)
 
 	// must be last line
 	server.Listen()

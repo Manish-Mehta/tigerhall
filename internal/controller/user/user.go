@@ -8,7 +8,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v5"
 
-	"github.com/Manish-Mehta/tigerhall/dto"
+	"github.com/Manish-Mehta/tigerhall/api/dto"
 	us "github.com/Manish-Mehta/tigerhall/internal/service/user"
 )
 

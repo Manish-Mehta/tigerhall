@@ -8,7 +8,7 @@ import (
 	"github.com/Manish-Mehta/tigerhall/pkg/interceptor"
 	"github.com/gin-gonic/gin"
 
-	"github.com/Manish-Mehta/tigerhall/dto"
+	"github.com/Manish-Mehta/tigerhall/api/dto"
 	ts "github.com/Manish-Mehta/tigerhall/internal/service/tiger"
 )
 

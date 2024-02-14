@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/Manish-Mehta/tigerhall/dto"
+	"github.com/Manish-Mehta/tigerhall/api/dto"
 	"github.com/Manish-Mehta/tigerhall/model/entities"
 	"gorm.io/gorm"
 )
