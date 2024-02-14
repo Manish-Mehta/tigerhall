@@ -1,0 +1,359 @@
+basePath: /api/v1
+definitions:
+  dto.Coordinate:
+    properties:
+      lat:
+        type: number
+      lon:
+        type: number
+    required:
+    - lat
+    - lon
+    type: object
+  dto.CreateSightingRequest:
+    type: object
+  dto.ListSightingResponse:
+    properties:
+      id:
+        type: integer
+      image:
+        type: string
+      lat:
+        type: number
+      lon:
+        type: number
+      seenAt:
+        type: string
+      tigerId:
+        type: integer
+      userId:
+        type: integer
+    required:
+    - id
+    - image
+    - lat
+    - lon
+    - seenAt
+    - tigerId
+    type: object
+  dto.ListTigerResponse:
+    properties:
+      coordinate:
+        $ref: '#/definitions/dto.Coordinate'
+      dob:
+        type: string
+      id:
+        type: integer
+      lastSeen:
+        type: string
+      name:
+        type: string
+    required:
+    - coordinate
+    - dob
+    - id
+    - lastSeen
+    - name
+    type: object
+  dto.LoginRequest:
+    properties:
+      email:
+        type: string
+      password:
+        minLength: 5
+        type: string
+    required:
+    - email
+    - password
+    type: object
+  dto.LoginResponse:
+    properties:
+      access_token:
+        type: string
+    required:
+    - access_token
+    type: object
+  dto.SignupRequest:
+    properties:
+      email:
+        type: string
+      password:
+        minLength: 5
+        type: string
+      userName:
+        type: string
+    required:
+    - email
+    - password
+    - userName
+    type: object
+  dto.TigerCreateRequest:
+    properties:
+      coordinate:
+        $ref: '#/definitions/dto.Coordinate'
+      dob:
+        type: string
+      lastSeen:
+        type: string
+      name:
+        type: string
+    required:
+    - coordinate
+    - dob
+    - lastSeen
+    - name
+    type: object
+  errorhandler.Error:
+    properties:
+      err:
+        type: string
+      errMsg:
+        type: string
+      statusCode:
+        type: integer
+    type: object
+host: localhost:3000
+info:
+  contact: {}
+  description: Tiger service API for tiger management and recording system
+  title: Tiger service API
+  version: "1.0"
+paths:
+  /sight:
+    get:
+      consumes:
+      - application/json
+      description: Sorted by the last time the tigers were seen.
+      parameters:
+      - description: Page number to be fetched
+        in: query
+        minimum: 1
+        name: page
+        type: integer
+      - description: Number of records to be fetched
+        in: query
+        minimum: 1
+        name: limit
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/dto.ListSightingResponse'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/errorhandler.Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/errorhandler.Error'
+      summary: List All Sighting of Tigers
+      tags:
+      - sighting
+    post:
+      consumes:
+      - application/json
+      description: |-
+        Records last sighting of a tiger
+        NOTE: Access Token needed in Authorization header
+      parameters:
+      - description: Sight Details
+        in: body
+        name: sight
+        required: true
+        schema:
+          $ref: '#/definitions/dto.CreateSightingRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/errorhandler.Error'
+        "409":
+          description: Conflict
+          schema:
+            $ref: '#/definitions/errorhandler.Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/errorhandler.Error'
+      security:
+      - ApiKeyAuth: []
+      summary: Create a new sighting of a tiger
+      tags:
+      - sighting
+  /tiger:
+    get:
+      consumes:
+      - application/json
+      description: Sorted by the last time the tigers were seen.
+      parameters:
+      - description: Page number to be fetched
+        in: query
+        minimum: 1
+        name: page
+        type: integer
+      - description: Number of records to be fetched
+        in: query
+        minimum: 1
+        name: limit
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/dto.ListTigerResponse'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/errorhandler.Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/errorhandler.Error'
+      summary: List All Tigers
+      tags:
+      - tiger
+    post:
+      consumes:
+      - application/json
+      description: |-
+        Creates a new tiger
+        NOTE: Access Token needed in Authorization header
+      parameters:
+      - description: Tiger Details
+        in: body
+        name: tiger
+        required: true
+        schema:
+          $ref: '#/definitions/dto.TigerCreateRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/errorhandler.Error'
+        "409":
+          description: Conflict
+          schema:
+            $ref: '#/definitions/errorhandler.Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/errorhandler.Error'
+      security:
+      - ApiKeyAuth: []
+      summary: Create Tiger
+      tags:
+      - tiger
+  /user:
+    post:
+      consumes:
+      - application/json
+      description: Creates a new user
+      parameters:
+      - description: User Details
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/dto.SignupRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/errorhandler.Error'
+        "409":
+          description: Conflict
+          schema:
+            $ref: '#/definitions/errorhandler.Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/errorhandler.Error'
+      summary: User Signup
+      tags:
+      - user
+  /user/login:
+    post:
+      consumes:
+      - application/json
+      description: Log the user in
+      parameters:
+      - description: User Creds
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/dto.LoginRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.LoginResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/errorhandler.Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/errorhandler.Error'
+      summary: User Login
+      tags:
+      - user
+  /user/refresh:
+    get:
+      consumes:
+      - application/json
+      description: |-
+        Refreshes the user access token.
+        NOTE: Access Token needed in Authorization header
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.LoginResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/errorhandler.Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/errorhandler.Error'
+      security:
+      - ApiKeyAuth: []
+      summary: User Token Refresh
+      tags:
+      - user
+securityDefinitions:
+  ApiKeyAuth:
+    description: Description for what is this security definition being used
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"
