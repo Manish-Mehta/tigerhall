@@ -8,7 +8,9 @@ import (
 	"github.com/gin-contrib/cors"
 
 	"github.com/Manish-Mehta/tigerhall/api"
+	_ "github.com/Manish-Mehta/tigerhall/docs"
 	"github.com/Manish-Mehta/tigerhall/internal/config"
+	"github.com/Manish-Mehta/tigerhall/internal/queue"
 	"github.com/Manish-Mehta/tigerhall/model"
 	"github.com/Manish-Mehta/tigerhall/pkg/db"
 	"github.com/Manish-Mehta/tigerhall/pkg/email"
@@ -56,6 +58,10 @@ func main() {
 	})
 
 	api.SetupRouter(server.GinInstance)
+
+	// Start the Queue service for Tiger sighting email Notification
+	go queue.SightingListener(config.TIGER_SIGHTING_CHAN)
+	go queue.EmailListener(config.EMAIL_EVENT_CHAN)
 
 	// must be last line
 	server.Listen()

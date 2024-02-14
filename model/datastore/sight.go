@@ -9,11 +9,17 @@ import (
 	"gorm.io/gorm"
 )
 
+type SighitngUserDetails struct {
+	Tname string
+	Uname string
+	Email string
+}
 type SightStore interface {
 	Create(*entities.Sight) error
 	GetLatest(dest *entities.Sight, condition *entities.Sight, fields []string) error
 	GetDistance(dto.Coordinate, dto.Coordinate) (float64, error)
 	List(dest *[]*entities.Sight, page, limit int, fields []string) error
+	GetUsersForTigerSight(tigerId uint) ([]SighitngUserDetails, error)
 }
 
 var NewSightStore = func(db *gorm.DB) SightStore {
@@ -36,6 +42,17 @@ func (ss *sightStore) Create(user *entities.Sight) error {
 
 func (ss *sightStore) GetLatest(dest *entities.Sight, condition *entities.Sight, fields []string) error {
 	return ss.db.Select(fields).Order("seen_at desc").Find(dest, condition).Limit(1).Error
+}
+
+func (ss *sightStore) GetUsersForTigerSight(tigerId uint) ([]SighitngUserDetails, error) {
+	var results []SighitngUserDetails
+	q := fmt.Sprintf(
+		`select  distinct t."name" as tname, u.user_name as uname, u.email as email from sight s left join "user" u on u.id = s.user_id  left join tiger t on t.id = s.tiger_id where s.tiger_id = %d`,
+		tigerId,
+	)
+	err := ss.db.Raw(q).Scan(&results).Error
+
+	return results, err
 }
 
 func (ss *sightStore) GetDistance(coord1, coord2 dto.Coordinate) (float64, error) {

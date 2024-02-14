@@ -13,6 +13,11 @@ import (
 	errorHandler "github.com/Manish-Mehta/tigerhall/pkg/error-handler"
 )
 
+type EmailEvent struct {
+	TigerID    uint
+	UserEmails []string
+}
+
 var (
 	DB_STR          string
 	SERVER_PORT     string
@@ -31,6 +36,9 @@ var (
 	AWS_SECRET_ACCESS_KEY string
 
 	IMAGE_STORAGE_PATH string
+
+	TIGER_SIGHTING_CHAN = make(chan uint)
+	EMAIL_EVENT_CHAN    = make(chan EmailEvent, 10)
 )
 
 const (

@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"github.com/Manish-Mehta/tigerhall/api/dto"
+	"github.com/Manish-Mehta/tigerhall/internal/config"
 	"github.com/Manish-Mehta/tigerhall/internal/util"
 	"github.com/Manish-Mehta/tigerhall/model/datastore"
 	"github.com/Manish-Mehta/tigerhall/model/entities"
@@ -125,7 +126,8 @@ func (service *sightService) create(request *dto.CreateSightingRequest, imgType 
 		},
 	)
 
-	// TODO: Start process of email sending Asynch  with Queue
+	// Start process of email sending Asynch(Chan) with Queue
+	config.TIGER_SIGHTING_CHAN <- sightEntity.TigerID
 	return nil
 }
 
