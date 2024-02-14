@@ -3,6 +3,10 @@ package api
 import (
 	"log"
 
+	"github.com/gin-gonic/gin"
+	swaggerFiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
+
 	sc "github.com/Manish-Mehta/tigerhall/internal/controller/sight"
 	tc "github.com/Manish-Mehta/tigerhall/internal/controller/tiger"
 	uc "github.com/Manish-Mehta/tigerhall/internal/controller/user"
@@ -12,15 +16,26 @@ import (
 	us "github.com/Manish-Mehta/tigerhall/internal/service/user"
 	"github.com/Manish-Mehta/tigerhall/model/datastore"
 	"github.com/Manish-Mehta/tigerhall/pkg/db"
-	"github.com/gin-gonic/gin"
 )
 
+// @title 	Tiger service API
+// @version	1.0
+// @description Tiger service API for tiger management and recording system
+
+// @host 	localhost:3000
+// @BasePath /api/v1
+
+// @securityDefinitions.apikey	ApiKeyAuth
+// @in							header
+// @name						Authorization
+// @description				Description for what is this security definition being used
 func SetupRouter(engine *gin.Engine) {
 	log.Println("Initializing Routes")
 	dBClient := db.GetDBClient().GetClient()
 	engine.MaxMultipartMemory = 8 << 20 // 8 MiB
 
 	apiRouter := engine.Group("/api/v1")
+	apiRouter.GET("/docs/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 	{
 		apiRouter.HEAD("/health", HealthApi)
 		apiRouter.GET("/health", HealthApi)
@@ -35,7 +50,7 @@ func SetupRouter(engine *gin.Engine) {
 			{
 				userRouter.POST("", userController.Signup)
 				userRouter.POST("/login", userController.Login)
-				userRouter.POST("/refresh", middleware.AuthMiddleware, userController.Refresh)
+				userRouter.GET("/refresh", middleware.AuthMiddleware, userController.Refresh)
 
 			}
 		}
