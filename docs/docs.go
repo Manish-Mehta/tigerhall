@@ -17,7 +17,7 @@ const docTemplate = `{
     "paths": {
         "/sight": {
             "get": {
-                "description": "Sorted by the last time the tigers were seen.",
+                "description": "Sorted by the last time the tigers were seen.\nSupports pagination with page number and limit(number of records to fetch).\nPage and Limit must be valid integer. Default values: page - 1, limit - 5",
                 "consumes": [
                     "application/json"
                 ],
@@ -57,13 +57,13 @@ const docTemplate = `{
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/errorhandler.Error"
+                            "$ref": "#/definitions/interceptor.Response"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/errorhandler.Error"
+                            "$ref": "#/definitions/interceptor.Response"
                         }
                     }
                 }
@@ -74,9 +74,9 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
-                "description": "Records last sighting of a tiger\nNOTE: Access Token needed in Authorization header",
+                "description": "Records last sighting of a tiger\nNew sighting notifies all the user who reported a sighting for the same tiger in past.\nWill respond with conflict(409) status, If the previous sighting of the same tiger was within the 5 KM.\nNOTE: Access Token needed in Authorization header",
                 "consumes": [
-                    "application/json"
+                    "multipart/form-data"
                 ],
                 "produces": [
                     "application/json"
@@ -87,13 +87,35 @@ const docTemplate = `{
                 "summary": "Create a new sighting of a tiger",
                 "parameters": [
                     {
-                        "description": "Sight Details",
-                        "name": "sight",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/dto.CreateSightingRequest"
-                        }
+                        "type": "number",
+                        "name": "lat",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "number",
+                        "name": "lon",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "name": "seenAt",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "name": "tigerId",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "file",
+                        "description": "Tiger Image file",
+                        "name": "image",
+                        "in": "formData",
+                        "required": true
                     }
                 ],
                 "responses": {
@@ -103,19 +125,19 @@ const docTemplate = `{
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/errorhandler.Error"
+                            "$ref": "#/definitions/interceptor.Response"
                         }
                     },
                     "409": {
                         "description": "Conflict",
                         "schema": {
-                            "$ref": "#/definitions/errorhandler.Error"
+                            "$ref": "#/definitions/interceptor.Response"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/errorhandler.Error"
+                            "$ref": "#/definitions/interceptor.Response"
                         }
                     }
                 }
@@ -123,7 +145,7 @@ const docTemplate = `{
         },
         "/tiger": {
             "get": {
-                "description": "Sorted by the last time the tigers were seen.",
+                "description": "Sorted by the last time the tigers were seen.\nSupports pagination with page number and limit(number of records to fetch).\nPage and Limit must be valid integer. Default values: page - 1, limit - 5",
                 "consumes": [
                     "application/json"
                 ],
@@ -163,13 +185,13 @@ const docTemplate = `{
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/errorhandler.Error"
+                            "$ref": "#/definitions/interceptor.Response"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/errorhandler.Error"
+                            "$ref": "#/definitions/interceptor.Response"
                         }
                     }
                 }
@@ -180,7 +202,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
-                "description": "Creates a new tiger\nNOTE: Access Token needed in Authorization header",
+                "description": "Creates a new tiger, Tiger name must be unique.\nD.O.B must be a string in format of \"yyyy-mm-dd\", ex: \"2020-07-17\".\nLast Seen must be a string representing UTC Date-Time in ISO 8601 format, ex: \"2023-02-12T14:58:46Z\".\nLat and Lon must valid decimal values, ex: 35.083742442502925, 78.52220233592793\nNOTE: Access Token needed in Authorization header",
                 "consumes": [
                     "application/json"
                 ],
@@ -209,19 +231,19 @@ const docTemplate = `{
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/errorhandler.Error"
+                            "$ref": "#/definitions/interceptor.Response"
                         }
                     },
                     "409": {
                         "description": "Conflict",
                         "schema": {
-                            "$ref": "#/definitions/errorhandler.Error"
+                            "$ref": "#/definitions/interceptor.Response"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/errorhandler.Error"
+                            "$ref": "#/definitions/interceptor.Response"
                         }
                     }
                 }
@@ -229,7 +251,7 @@ const docTemplate = `{
         },
         "/user": {
             "post": {
-                "description": "Creates a new user",
+                "description": "Creates a new user\nPassword Must be 5 character or more",
                 "consumes": [
                     "application/json"
                 ],
@@ -258,19 +280,19 @@ const docTemplate = `{
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/errorhandler.Error"
+                            "$ref": "#/definitions/interceptor.Response"
                         }
                     },
                     "409": {
                         "description": "Conflict",
                         "schema": {
-                            "$ref": "#/definitions/errorhandler.Error"
+                            "$ref": "#/definitions/interceptor.Response"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/errorhandler.Error"
+                            "$ref": "#/definitions/interceptor.Response"
                         }
                     }
                 }
@@ -278,7 +300,7 @@ const docTemplate = `{
         },
         "/user/login": {
             "post": {
-                "description": "Log the user in",
+                "description": "Log the user in by returning the API access_token (JWT)\nUse the access_token in further API calls inside Authorization Header",
                 "consumes": [
                     "application/json"
                 ],
@@ -310,13 +332,13 @@ const docTemplate = `{
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/errorhandler.Error"
+                            "$ref": "#/definitions/interceptor.Response"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/errorhandler.Error"
+                            "$ref": "#/definitions/interceptor.Response"
                         }
                     }
                 }
@@ -329,7 +351,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
-                "description": "Refreshes the user access token.\nNOTE: Access Token needed in Authorization header",
+                "description": "Refreshes the user access token by providing a new/fresh access token.\nToken refresh only happens within 1 hour of current token expiry\nNOTE: Access Token needed in Authorization header",
                 "consumes": [
                     "application/json"
                 ],
@@ -350,13 +372,13 @@ const docTemplate = `{
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/errorhandler.Error"
+                            "$ref": "#/definitions/interceptor.Response"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/errorhandler.Error"
+                            "$ref": "#/definitions/interceptor.Response"
                         }
                     }
                 }
@@ -378,9 +400,6 @@ const docTemplate = `{
                     "type": "number"
                 }
             }
-        },
-        "dto.CreateSightingRequest": {
-            "type": "object"
         },
         "dto.ListSightingResponse": {
             "type": "object",
@@ -513,17 +532,16 @@ const docTemplate = `{
                 }
             }
         },
-        "errorhandler.Error": {
+        "interceptor.Response": {
             "type": "object",
             "properties": {
-                "err": {
+                "data": {},
+                "error": {},
+                "message": {
                     "type": "string"
                 },
-                "errMsg": {
-                    "type": "string"
-                },
-                "statusCode": {
-                    "type": "integer"
+                "success": {
+                    "type": "boolean"
                 }
             }
         }

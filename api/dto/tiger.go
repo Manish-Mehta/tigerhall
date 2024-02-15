@@ -27,11 +27,11 @@ type ListTigerResponse struct {
 
 type CreateSightingRequest struct {
 	TigerID uint                  `form:"tigerId" binding:"required"`
-	UserID  uint                  `form:"userId"`
+	UserID  uint                  `form:"userId" swaggerignore:"true"`
 	Lat     float64               `form:"lat" binding:"required"`
 	Lon     float64               `form:"lon" binding:"required"`
 	SeenAt  time.Time             `form:"seenAt" binding:"required"`
-	Image   *multipart.FileHeader `form:"image" binding:"required"`
+	Image   *multipart.FileHeader `form:"image" binding:"required" swaggerignore:"true"`
 }
 
 type ListSightingResponse struct {

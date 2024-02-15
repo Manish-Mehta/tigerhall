@@ -25,16 +25,19 @@ const LIMIT = 5
 // CreateTiger godoc
 //
 //	@Summary		Create Tiger
-//	@Description	Creates a new tiger
+//	@Description	Creates a new tiger, Tiger name must be unique.
+//	@Description	D.O.B must be a string in format of "yyyy-mm-dd", ex: "2020-07-17".
+//	@Description	Last Seen must be a string representing UTC Date-Time in ISO 8601 format, ex: "2023-02-12T14:58:46Z".
+//	@Description	Lat and Lon must valid decimal values, ex: 35.083742442502925, 78.52220233592793
 //	@Description	NOTE: Access Token needed in Authorization header
 //	@Tags			tiger
 //	@Accept			json
 //	@Produce		json
 //	@Param			tiger			body		dto.TigerCreateRequest true	"Tiger Details"
 //	@Success		201
-//	@Failure		409	{object}	errorhandler.Error
-//	@Failure		400	{object}	errorhandler.Error
-//	@Failure		500	{object}	errorhandler.Error
+//	@Failure		409	{object}	interceptor.Response
+//	@Failure		400	{object}	interceptor.Response
+//	@Failure		500	{object}	interceptor.Response
 //	@Router			/tiger [post]
 //
 // @Security ApiKeyAuth
@@ -59,14 +62,16 @@ func (tc tigerController) Create(c *gin.Context) {
 //
 //	@Summary		List All Tigers
 //	@Description	Sorted by the last time the tigers were seen.
+//	@Description	Supports pagination with page number and limit(number of records to fetch).
+//	@Description	Page and Limit must be valid integer. Default values: page - 1, limit - 5
 //	@Tags			tiger
 //	@Accept			json
 //	@Produce		json
 //	@Param   		page         	query    	int        false  "Page number to be fetched"         		 minimum(1)
 //	@Param   		limit         	query    	int        false  "Number of records to be fetched"          minimum(1)
 //	@Success		200 {array}		dto.ListTigerResponse
-//	@Failure		400	{object}	errorhandler.Error
-//	@Failure		500	{object}	errorhandler.Error
+//	@Failure		400	{object}	interceptor.Response
+//	@Failure		500	{object}	interceptor.Response
 //	@Router			/tiger [get]
 func (tc tigerController) List(c *gin.Context) {
 	defer errorHandler.RecoverAndSendErrRes(c, "Something went wrong while creating tiger")

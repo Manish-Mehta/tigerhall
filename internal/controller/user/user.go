@@ -25,14 +25,15 @@ type userController struct {
 //
 //	@Summary		User Signup
 //	@Description	Creates a new user
+//	@Description	Password Must be 5 character or more
 //	@Tags			user
 //	@Accept			json
 //	@Produce		json
 //	@Param			user			body		dto.SignupRequest true	"User Details"
 //	@Success		201
-//	@Failure		409	{object}	errorhandler.Error
-//	@Failure		400	{object}	errorhandler.Error
-//	@Failure		500	{object}	errorhandler.Error
+//	@Failure		409	{object}	interceptor.Response
+//	@Failure		400	{object}	interceptor.Response
+//	@Failure		500	{object}	interceptor.Response
 //	@Router			/user [post]
 func (uc userController) Signup(c *gin.Context) {
 	defer errorHandler.RecoverAndSendErrRes(c, "Something went wrong while creating user")
@@ -53,14 +54,15 @@ func (uc userController) Signup(c *gin.Context) {
 // UserLogin godoc
 //
 //	@Summary		User Login
-//	@Description	Log the user in
+//	@Description	Log the user in by returning the API access_token (JWT)
+//	@Description	Use the access_token in further API calls inside Authorization Header
 //	@Tags			user
 //	@Accept			json
 //	@Produce		json
 //	@Param			user			body		dto.LoginRequest true	"User Creds"
 //	@Success		200 {object}	dto.LoginResponse
-//	@Failure		400	{object}	errorhandler.Error
-//	@Failure		500	{object}	errorhandler.Error
+//	@Failure		400	{object}	interceptor.Response
+//	@Failure		500	{object}	interceptor.Response
 //	@Router			/user/login [post]
 func (uc userController) Login(c *gin.Context) {
 	defer errorHandler.RecoverAndSendErrRes(c, "Something went wrong while logging in")
@@ -81,14 +83,15 @@ func (uc userController) Login(c *gin.Context) {
 // UserTokenRefresh godoc
 //
 //	@Summary		User Token Refresh
-//	@Description	Refreshes the user access token.
+//	@Description	Refreshes the user access token by providing a new/fresh access token.
+//	@Description	Token refresh only happens within 1 hour of current token expiry
 //	@Description	NOTE: Access Token needed in Authorization header
 //	@Tags			user
 //	@Accept			json
 //	@Produce		json
 //	@Success		200 {object}	dto.LoginResponse
-//	@Failure		400	{object}	errorhandler.Error
-//	@Failure		500	{object}	errorhandler.Error
+//	@Failure		400	{object}	interceptor.Response
+//	@Failure		500	{object}	interceptor.Response
 //	@Router			/user/refresh [get]
 //
 // @Security ApiKeyAuth

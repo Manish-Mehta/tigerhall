@@ -11,7 +11,6 @@ import (
 
 type SighitngUserDetails struct {
 	Tname string
-	Uname string
 	Email string
 }
 type SightStore interface {
@@ -47,7 +46,7 @@ func (ss *sightStore) GetLatest(dest *entities.Sight, condition *entities.Sight,
 func (ss *sightStore) GetUsersForTigerSight(tigerId uint) ([]SighitngUserDetails, error) {
 	var results []SighitngUserDetails
 	q := fmt.Sprintf(
-		`select  distinct t."name" as tname, u.user_name as uname, u.email as email from sight s left join "user" u on u.id = s.user_id  left join tiger t on t.id = s.tiger_id where s.tiger_id = %d`,
+		`select  distinct t."name" as tname, u.email as email from sight s left join "user" u on u.id = s.user_id  left join tiger t on t.id = s.tiger_id where s.tiger_id = %d`,
 		tigerId,
 	)
 	err := ss.db.Raw(q).Scan(&results).Error

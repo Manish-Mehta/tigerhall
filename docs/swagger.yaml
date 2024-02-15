@@ -10,8 +10,6 @@ definitions:
     - lat
     - lon
     type: object
-  dto.CreateSightingRequest:
-    type: object
   dto.ListSightingResponse:
     properties:
       id:
@@ -103,14 +101,14 @@ definitions:
     - lastSeen
     - name
     type: object
-  errorhandler.Error:
+  interceptor.Response:
     properties:
-      err:
+      data: {}
+      error: {}
+      message:
         type: string
-      errMsg:
-        type: string
-      statusCode:
-        type: integer
+      success:
+        type: boolean
     type: object
 host: localhost:3000
 info:
@@ -123,7 +121,10 @@ paths:
     get:
       consumes:
       - application/json
-      description: Sorted by the last time the tigers were seen.
+      description: |-
+        Sorted by the last time the tigers were seen.
+        Supports pagination with page number and limit(number of records to fetch).
+        Page and Limit must be valid integer. Default values: page - 1, limit - 5
       parameters:
       - description: Page number to be fetched
         in: query
@@ -147,27 +148,44 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/errorhandler.Error'
+            $ref: '#/definitions/interceptor.Response'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/errorhandler.Error'
+            $ref: '#/definitions/interceptor.Response'
       summary: List All Sighting of Tigers
       tags:
       - sighting
     post:
       consumes:
-      - application/json
+      - multipart/form-data
       description: |-
         Records last sighting of a tiger
+        New sighting notifies all the user who reported a sighting for the same tiger in past.
+        Will respond with conflict(409) status, If the previous sighting of the same tiger was within the 5 KM.
         NOTE: Access Token needed in Authorization header
       parameters:
-      - description: Sight Details
-        in: body
-        name: sight
+      - in: formData
+        name: lat
         required: true
-        schema:
-          $ref: '#/definitions/dto.CreateSightingRequest'
+        type: number
+      - in: formData
+        name: lon
+        required: true
+        type: number
+      - in: formData
+        name: seenAt
+        required: true
+        type: string
+      - in: formData
+        name: tigerId
+        required: true
+        type: integer
+      - description: Tiger Image file
+        in: formData
+        name: image
+        required: true
+        type: file
       produces:
       - application/json
       responses:
@@ -176,15 +194,15 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/errorhandler.Error'
+            $ref: '#/definitions/interceptor.Response'
         "409":
           description: Conflict
           schema:
-            $ref: '#/definitions/errorhandler.Error'
+            $ref: '#/definitions/interceptor.Response'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/errorhandler.Error'
+            $ref: '#/definitions/interceptor.Response'
       security:
       - ApiKeyAuth: []
       summary: Create a new sighting of a tiger
@@ -194,7 +212,10 @@ paths:
     get:
       consumes:
       - application/json
-      description: Sorted by the last time the tigers were seen.
+      description: |-
+        Sorted by the last time the tigers were seen.
+        Supports pagination with page number and limit(number of records to fetch).
+        Page and Limit must be valid integer. Default values: page - 1, limit - 5
       parameters:
       - description: Page number to be fetched
         in: query
@@ -218,11 +239,11 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/errorhandler.Error'
+            $ref: '#/definitions/interceptor.Response'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/errorhandler.Error'
+            $ref: '#/definitions/interceptor.Response'
       summary: List All Tigers
       tags:
       - tiger
@@ -230,7 +251,10 @@ paths:
       consumes:
       - application/json
       description: |-
-        Creates a new tiger
+        Creates a new tiger, Tiger name must be unique.
+        D.O.B must be a string in format of "yyyy-mm-dd", ex: "2020-07-17".
+        Last Seen must be a string representing UTC Date-Time in ISO 8601 format, ex: "2023-02-12T14:58:46Z".
+        Lat and Lon must valid decimal values, ex: 35.083742442502925, 78.52220233592793
         NOTE: Access Token needed in Authorization header
       parameters:
       - description: Tiger Details
@@ -247,15 +271,15 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/errorhandler.Error'
+            $ref: '#/definitions/interceptor.Response'
         "409":
           description: Conflict
           schema:
-            $ref: '#/definitions/errorhandler.Error'
+            $ref: '#/definitions/interceptor.Response'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/errorhandler.Error'
+            $ref: '#/definitions/interceptor.Response'
       security:
       - ApiKeyAuth: []
       summary: Create Tiger
@@ -265,7 +289,9 @@ paths:
     post:
       consumes:
       - application/json
-      description: Creates a new user
+      description: |-
+        Creates a new user
+        Password Must be 5 character or more
       parameters:
       - description: User Details
         in: body
@@ -281,15 +307,15 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/errorhandler.Error'
+            $ref: '#/definitions/interceptor.Response'
         "409":
           description: Conflict
           schema:
-            $ref: '#/definitions/errorhandler.Error'
+            $ref: '#/definitions/interceptor.Response'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/errorhandler.Error'
+            $ref: '#/definitions/interceptor.Response'
       summary: User Signup
       tags:
       - user
@@ -297,7 +323,9 @@ paths:
     post:
       consumes:
       - application/json
-      description: Log the user in
+      description: |-
+        Log the user in by returning the API access_token (JWT)
+        Use the access_token in further API calls inside Authorization Header
       parameters:
       - description: User Creds
         in: body
@@ -315,11 +343,11 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/errorhandler.Error'
+            $ref: '#/definitions/interceptor.Response'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/errorhandler.Error'
+            $ref: '#/definitions/interceptor.Response'
       summary: User Login
       tags:
       - user
@@ -328,7 +356,8 @@ paths:
       consumes:
       - application/json
       description: |-
-        Refreshes the user access token.
+        Refreshes the user access token by providing a new/fresh access token.
+        Token refresh only happens within 1 hour of current token expiry
         NOTE: Access Token needed in Authorization header
       produces:
       - application/json
@@ -340,11 +369,11 @@ paths:
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/errorhandler.Error'
+            $ref: '#/definitions/interceptor.Response'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/errorhandler.Error'
+            $ref: '#/definitions/interceptor.Response'
       security:
       - ApiKeyAuth: []
       summary: User Token Refresh

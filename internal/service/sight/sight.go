@@ -127,7 +127,7 @@ func (service *sightService) create(request *dto.CreateSightingRequest, imgType 
 	)
 
 	// Start process of email sending Asynch(Chan) with Queue
-	config.TIGER_SIGHTING_CHAN <- sightEntity.TigerID
+	go func(id uint) { config.TIGER_SIGHTING_CHAN <- id }(sightEntity.TigerID)
 	return nil
 }
 

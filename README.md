@@ -9,3 +9,4 @@
 
 1. go install github.com/swaggo/swag/cmd/swag@latest
 2. swag init -g api/router.go
+3. http://localhost:3000/api/v1/docs/index.html

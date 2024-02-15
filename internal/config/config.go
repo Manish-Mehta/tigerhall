@@ -14,8 +14,8 @@ import (
 )
 
 type EmailEvent struct {
-	TigerID    uint
-	UserEmails []string
+	TigerName  string
+	UserEmails []*string
 }
 
 var (
@@ -37,7 +37,7 @@ var (
 
 	IMAGE_STORAGE_PATH string
 
-	TIGER_SIGHTING_CHAN = make(chan uint)
+	TIGER_SIGHTING_CHAN = make(chan uint, 10)
 	EMAIL_EVENT_CHAN    = make(chan EmailEvent, 10)
 )
 

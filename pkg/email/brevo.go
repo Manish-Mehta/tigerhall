@@ -17,21 +17,35 @@ func (brevoEmailClient *brevoEmailClient) CreateClient(params ClientParam) {
 
 func (brevoEmailClient *brevoEmailClient) CreateEmailInputs(emailComposition EmailComposition) (interface{}, error) {
 
-	return &map[string]interface{}{
+	inputs := map[string]interface{}{
 		"sender": map[string]interface{}{
 			"name":  "Manish Test",
 			"email": emailComposition.FromAddress,
 		},
-		"to": []interface{}{
-			map[string]interface{}{
-				"email": emailComposition.ToAddresses,
-				"name":  "John Doe",
-			},
-		},
 		"subject":     emailComposition.Message.Subject,
 		"htmlContent": emailComposition.Message.Body.Html,
-		//    "htmlContent":"<html><head></head><body><p>Hello,</p>Hello.</p></body></html>"
-	}, nil
+	}
+
+	type Email struct {
+		Name  string
+		Email string
+	}
+
+	if len(emailComposition.ToAddresses) > 0 {
+		toEmails := []Email{}
+		for _, id := range emailComposition.ToAddresses {
+			toEmails = append(toEmails, Email{Email: *id, Name: "User"})
+		}
+		inputs["to"] = toEmails
+	}
+	if len(emailComposition.BccAddresses) > 0 {
+		bccEmails := []Email{}
+		for _, id := range emailComposition.BccAddresses {
+			bccEmails = append(bccEmails, Email{Email: *id, Name: "User"})
+		}
+		inputs["bcc"] = bccEmails
+	}
+	return &inputs, nil
 
 }
 
@@ -50,6 +64,7 @@ func (brevoEmailClient *brevoEmailClient) SendEmail(emailInput interface{}) bool
 
 	_, err = rc.CheckResponse(restyRes, err, http.StatusCreated, "Brevo")
 	if err != nil {
+		log.Println(err)
 		log.Println("Email sending failed")
 		return false
 	}

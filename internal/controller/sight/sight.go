@@ -27,15 +27,18 @@ const LIMIT = 5
 //
 //	@Summary		Create a new sighting of a tiger
 //	@Description	Records last sighting of a tiger
+//	@Description	New sighting notifies all the user who reported a sighting for the same tiger in past.
+//	@Description	Will respond with conflict(409) status, If the previous sighting of the same tiger was within the 5 KM.
 //	@Description	NOTE: Access Token needed in Authorization header
 //	@Tags			sighting
-//	@Accept			json
+//	@Accept			multipart/form-data
 //	@Produce		json
-//	@Param			sight			body		dto.CreateSightingRequest true	"Sight Details"
+//	@Param			sight			formData		dto.CreateSightingRequest true	"Sight Details"
+//	@Param			image			formData		file true	"Tiger Image file < 6 MB"
 //	@Success		201
-//	@Failure		409	{object}	errorhandler.Error
-//	@Failure		400	{object}	errorhandler.Error
-//	@Failure		500	{object}	errorhandler.Error
+//	@Failure		409	{object}	interceptor.Response
+//	@Failure		400	{object}	interceptor.Response
+//	@Failure		500	{object}	interceptor.Response
 //	@Router			/sight [post]
 //
 // @Security ApiKeyAuth
@@ -69,14 +72,16 @@ func (sc sightController) Create(c *gin.Context) {
 //
 //	@Summary		List All Sighting of Tigers
 //	@Description	Sorted by the last time the tigers were seen.
+//	@Description	Supports pagination with page number and limit(number of records to fetch).
+//	@Description	Page and Limit must be valid integer. Default values: page - 1, limit - 5
 //	@Tags			sighting
 //	@Accept			json
 //	@Produce		json
 //	@Param   		page         	query    	int        false  "Page number to be fetched"         		 minimum(1)
 //	@Param   		limit         	query    	int        false  "Number of records to be fetched"          minimum(1)
 //	@Success		200 {array}		dto.ListSightingResponse
-//	@Failure		400	{object}	errorhandler.Error
-//	@Failure		500	{object}	errorhandler.Error
+//	@Failure		400	{object}	interceptor.Response
+//	@Failure		500	{object}	interceptor.Response
 //	@Router			/sight [get]
 func (sc sightController) List(c *gin.Context) {
 	defer errorHandler.RecoverAndSendErrRes(c, "Something went wrong while creating tiger")
