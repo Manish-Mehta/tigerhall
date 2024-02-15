@@ -89,5 +89,5 @@ func ProcessImage(imageFileHeader *multipart.FileHeader, fileNamePrefix uint, im
 			StatusCode: http.StatusInternalServerError,
 		}
 	}
-	return filePath, nil
+	return fileName, nil
 }
