@@ -10,7 +10,6 @@ import (
 	"mime/multipart"
 	"net/http"
 	"os"
-	"path/filepath"
 	"time"
 
 	"github.com/nfnt/resize"
@@ -65,8 +64,8 @@ func ProcessImage(imageFileHeader *multipart.FileHeader, fileNamePrefix uint, im
 	fileName := fmt.Sprintf("%d_%d.%s", fileNamePrefix, time.Now().Unix(), imgType)
 	homeDir, err := os.UserHomeDir()
 
-	filePath := filepath.Join(homeDir, config.IMAGE_STORAGE_PATH, fileName)
-	newFile, err := os.Create(filePath)
+	// filePath := filepath.Join(homeDir, config.IMAGE_STORAGE_PATH, fileName)
+	newFile, err := os.Create(fileName)
 	if err != nil {
 		log.Println(err)
 		return "", &errorHandler.Error{
