@@ -29,8 +29,6 @@ func AuthMiddleware(c *gin.Context) {
 		interceptor.SendErrRes(c, "Access denied", "Invalid access token", http.StatusUnauthorized)
 		return
 	} else if claims, ok = token.Claims.(*jwt.RegisteredClaims); ok {
-		// log.Println("claims.Subject, claims.ExpiresAt")
-		// log.Println(claims.Subject, claims.ExpiresAt)
 	} else {
 		interceptor.SendErrRes(c, "Token verification failed", "Error while checking token", http.StatusUnauthorized)
 		return
@@ -39,7 +37,7 @@ func AuthMiddleware(c *gin.Context) {
 	if strings.HasSuffix(c.Request.URL.Path, "refresh") {
 		c.Set("TokenExpiry", claims.ExpiresAt)
 	}
-	u, err := strconv.ParseUint(claims.Issuer, 10, 64)
+	u, _ := strconv.ParseUint(claims.Issuer, 10, 64)
 
 	c.Set("Id", u)
 	c.Set("Email", claims.Subject)

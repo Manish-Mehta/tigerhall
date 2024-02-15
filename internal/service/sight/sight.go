@@ -26,8 +26,6 @@ type sightService struct {
 func (service *sightService) Create(request *dto.CreateSightingRequest) *errorHandler.Error {
 	validator := util.NewValidator()
 
-	log.Println(request.Image.Filename, request.Image.Size, request.Image.Header.Get("Content-Type"))
-
 	err := validator.ValCoord(dto.Coordinate{Lat: request.Lat, Lon: request.Lon})
 	if err != nil {
 		return &errorHandler.Error{
@@ -46,7 +44,6 @@ func (service *sightService) Create(request *dto.CreateSightingRequest) *errorHa
 		}
 	}
 
-	// TODO: Add validation of 5KM check
 	sightEntity := &entities.Sight{}
 	err = service.dataStore.GetLatest(sightEntity, &entities.Sight{TigerID: request.TigerID}, []string{"id", "lat", "lon", "seen_at"})
 	if err != nil {
@@ -94,7 +91,7 @@ func (service *sightService) Create(request *dto.CreateSightingRequest) *errorHa
 }
 
 func (service *sightService) create(request *dto.CreateSightingRequest, imgType string) *errorHandler.Error {
-	// Add db entry for create
+
 	filePath, imgErr := imageHandler.ProcessImage(request.Image, request.TigerID, imgType)
 	if imgErr != nil {
 		return imgErr
@@ -126,7 +123,7 @@ func (service *sightService) create(request *dto.CreateSightingRequest, imgType 
 		},
 	)
 
-	// Start process of email sending Asynch(Chan) with Queue
+	// Start the event of email sending Asynch(Chan) with Queue
 	go func(id uint) { config.TIGER_SIGHTING_CHAN <- id }(sightEntity.TigerID)
 	return nil
 }
