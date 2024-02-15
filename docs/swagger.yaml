@@ -110,7 +110,7 @@ definitions:
       success:
         type: boolean
     type: object
-host: https://tiger-backend-api-app.onrender.com
+host: tiger-backend-api-app.onrender.com
 info:
   contact: {}
   description: Tiger service API for tiger management and recording system

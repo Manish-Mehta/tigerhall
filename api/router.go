@@ -22,7 +22,7 @@ import (
 // @version	1.0
 // @description Tiger service API for tiger management and recording system
 
-// @host 	https://tiger-backend-api-app.onrender.com
+// @host 	tiger-backend-api-app.onrender.com
 // @BasePath /api/v1
 
 // @securityDefinitions.apikey	ApiKeyAuth
