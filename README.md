@@ -14,11 +14,11 @@ Visit the live API documentation here: [https://tiger-backend-api-app.onrender.c
 
 ### Prerequisites to RUN:
 
-| Requirement                   | Version  | Icon |
-| ----------------------------- | -------- | ---- |
-| Golang                        | ~v1.21   |      |
-| Postgres DB                   | ~v15     |      |
-| Brevo Email Platform API Keys | Required |      |
+| Requirement                   | Version  |
+| ----------------------------- | -------- |
+| Golang                        | ~v1.21   |
+| Postgres DB                   | ~v15     |
+| Brevo Email Platform API Keys | Required |
 
 ## How to RUN:
 
