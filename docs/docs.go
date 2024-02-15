@@ -112,7 +112,7 @@ const docTemplate = `{
                     },
                     {
                         "type": "file",
-                        "description": "Tiger Image file",
+                        "description": "Tiger Image file \u003c 6 MB",
                         "name": "image",
                         "in": "formData",
                         "required": true
@@ -559,7 +559,7 @@ const docTemplate = `{
 // SwaggerInfo holds exported Swagger Info so clients can modify it
 var SwaggerInfo = &swag.Spec{
 	Version:          "1.0",
-	Host:             "localhost:3000",
+	Host:             "https://tiger-backend-api-app.onrender.com",
 	BasePath:         "/api/v1",
 	Schemes:          []string{},
 	Title:            "Tiger service API",
