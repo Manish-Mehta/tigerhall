@@ -19,7 +19,7 @@ import (
 
 func init() {
 	// LoadEnv is not required in managed apps deployment where variables are stored in their key vaults(ex: Kuberenetes secrets)
-	config.LoadEnv()
+	// config.LoadEnv()
 	config.SetConfig()
 }
 
