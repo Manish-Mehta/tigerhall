@@ -62,7 +62,7 @@ func ProcessImage(imageFileHeader *multipart.FileHeader, fileNamePrefix uint, im
 
 	resizedImg := resize.Resize(250, 200, imgDecoded, resize.Lanczos3)
 	fileName := fmt.Sprintf("%d_%d.%s", fileNamePrefix, time.Now().Unix(), imgType)
-	homeDir, err := os.UserHomeDir()
+	// homeDir, err := os.UserHomeDir()
 
 	// filePath := filepath.Join(homeDir, config.IMAGE_STORAGE_PATH, fileName)
 	newFile, err := os.Create(fileName)
