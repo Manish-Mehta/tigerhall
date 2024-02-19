@@ -64,29 +64,29 @@ var Getenv = func(key string) string {
 	return strings.Trim(val, " ")
 }
 
-func SetConfig() {
+func SetConfig(getEnv func(key string) string) {
 	{
-		DB_STR = Getenv("DB_STR")
-		SERVER_PORT = Getenv("SERVER_PORT")
-		ALLOWED_ORIGINS = Getenv("ALLOWED_ORIGINS")
+		DB_STR = getEnv("DB_STR")
+		SERVER_PORT = getEnv("SERVER_PORT")
+		ALLOWED_ORIGINS = getEnv("ALLOWED_ORIGINS")
 	}
 	{
-		TOKEN_SECRET = Getenv("TOKEN_SECRET")
+		TOKEN_SECRET = getEnv("TOKEN_SECRET")
 	}
 	// AWS Config[Not used as Brevo is used for email]
 	{
-		AWS_REGION = Getenv("AWS_REGION")
-		AWS_ACCESS_KEY_ID = Getenv("AWS_ACCESS_KEY_ID")
-		AWS_SECRET_ACCESS_KEY = Getenv("AWS_SECRET_ACCESS_KEY")
+		AWS_REGION = getEnv("AWS_REGION")
+		AWS_ACCESS_KEY_ID = getEnv("AWS_ACCESS_KEY_ID")
+		AWS_SECRET_ACCESS_KEY = getEnv("AWS_SECRET_ACCESS_KEY")
 	}
 	{
-		EMAIL_API_ENDPOINT = Getenv("EMAIL_API_ENDPOINT")
-		EMAIL_SERVICE = Getenv("EMAIL_SERVICE")
-		EMAIL_FROM_ADDRESS = Getenv("EMAIL_FROM_ADDRESS")
-		EMAIL_API_KEY = Getenv("EMAIL_API_KEY")
+		EMAIL_API_ENDPOINT = getEnv("EMAIL_API_ENDPOINT")
+		EMAIL_SERVICE = getEnv("EMAIL_SERVICE")
+		EMAIL_FROM_ADDRESS = getEnv("EMAIL_FROM_ADDRESS")
+		EMAIL_API_KEY = getEnv("EMAIL_API_KEY")
 	}
 	{
-		IMAGE_STORAGE_PATH = Getenv("IMAGE_STORAGE_PATH")
+		IMAGE_STORAGE_PATH = getEnv("IMAGE_STORAGE_PATH")
 	}
 }
 

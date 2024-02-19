@@ -43,7 +43,6 @@ func SetupRouter(engine *gin.Engine) {
 		// User Router
 		{
 			userRouter := apiRouter.Group("/user")
-
 			userStore := datastore.NewUserStore(dBClient)
 			userService := us.NewUserService(userStore)
 			userController := uc.NewUserController(userService)
@@ -59,7 +58,6 @@ func SetupRouter(engine *gin.Engine) {
 		{
 			tigerRouter := apiRouter.Group("/tiger")
 			tigerService := ts.NewTigerService(tigerStore)
-
 			tigerController := tc.NewTigerController(tigerService)
 			{
 				tigerRouter.POST("", middleware.AuthMiddleware, tigerController.Create)
@@ -71,7 +69,6 @@ func SetupRouter(engine *gin.Engine) {
 			sightRouter := apiRouter.Group("/sight")
 			sightStore := datastore.NewSightStore(dBClient)
 			sightService := ss.NewSightService(sightStore, tigerStore)
-
 			sightController := sc.NewSightController(sightService)
 			{
 				sightRouter.POST("", middleware.AuthMiddleware, sightController.Create)
